@@ -1,0 +1,4 @@
+RewriteEngine On
+
+# Mengarahkan URL daftar-turnamen/nama-turnamen ke file turnamen.html?slug=nama-turnamen
+RewriteRule ^daftar-turnamen/([a-zA-Z0-9-]+)$ daftar-turnamen/turnamen.html?slug=$1 [L,QSA]

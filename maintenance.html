@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlunderSquad — Sedang Maintenance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --board-black: #FFFFFF;
+    --board-cream: #1A1420;
+    --walnut: #7B5FA6;
+    --gold: #7C3AED;
+    --panel: #F6F2FB;
+    --panel-line: #E4D9F5;
+    --text-dim: #6B5C7D;
+    --glitch-1: #7C3AED;
+    --glitch-2: #C4B5FD;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--board-black);
+    color: var(--board-cream);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    animation: bgFlicker 4.6s ease-in-out infinite;
+  }
+
+  @keyframes bgFlicker {
+    0%   { background-color: #FFFFFF; }
+    38%  { background-color: #FFFFFF; }
+    50%  { background-color: #EDE4FB; }
+    62%  { background-color: #FFFFFF; }
+    80%  { background-color: #FFFFFF; }
+    90%  { background-color: #E4D4FA; }
+    100% { background-color: #FFFFFF; }
+  }
+
+  body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Papan catur samar sebagai tekstur background */
+  .board-texture {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.05;
+    background-image:
+      linear-gradient(45deg, var(--gold) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--gold) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--gold) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--gold) 75%);
+    background-size: 80px 80px;
+    background-position: 0 0, 0 40px, 40px -40px, -40px 0px;
+    pointer-events: none;
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(124, 58, 237, 0.10) 100%);
+  }
+
+  main {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 720px;
+    padding: 8vh 24px 10vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .rook-mark {
+    width: 34px;
+    height: 34px;
+    margin-bottom: 36px;
+    opacity: 0.55;
+  }
+  .rook-mark svg { width: 100%; height: 100%; fill: var(--gold); }
+
+  .eyebrow {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    color: var(--walnut);
+    margin: 0 0 18px;
+    font-weight: 500;
+  }
+
+  h1.flicker {
+    position: relative;
+    font-size: clamp(2.1rem, 6vw, 3.6rem);
+    font-weight: 600;
+    line-height: 1.15;
+    margin: 0 0 20px;
+    color: var(--board-cream);
+    letter-spacing: -0.01em;
+    animation: creepFlicker 4.6s ease-in-out infinite;
+  }
+
+  h1.flicker::before,
+  h1.flicker::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  h1.flicker::before {
+    color: var(--glitch-1);
+    animation: glitchShiftA 4.6s infinite linear;
+    mix-blend-mode: multiply;
+  }
+
+  h1.flicker::after {
+    color: var(--glitch-2);
+    animation: glitchShiftB 4.6s infinite linear;
+    mix-blend-mode: multiply;
+  }
+
+  @keyframes creepFlicker {
+    0%   { filter: blur(0px);    opacity: 1; }
+    38%  { filter: blur(0px);    opacity: 1; }
+    50%  { filter: blur(9px);    opacity: 0.35; }
+    62%  { filter: blur(0px);    opacity: 1; }
+    80%  { filter: blur(0px);    opacity: 1; }
+    90%  { filter: blur(6px);    opacity: 0.55; }
+    100% { filter: blur(0px);    opacity: 1; }
+  }
+
+  @keyframes glitchShiftA {
+    0%, 37% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+    39%     { clip-path: inset(10% 0 65% 0); transform: translate(-4px, 1px); opacity: 0.7; }
+    41%     { clip-path: inset(60% 0 5% 0); transform: translate(3px, -1px); opacity: 0.6; }
+    43%     { clip-path: inset(25% 0 40% 0); transform: translate(-2px, 0); opacity: 0.5; }
+    45%, 61% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+    63%     { clip-path: inset(45% 0 20% 0); transform: translate(-3px, 1px); opacity: 0.65; }
+    65%     { clip-path: inset(5% 0 70% 0); transform: translate(2px, -1px); opacity: 0.5; }
+    67%, 89% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+    91%     { clip-path: inset(30% 0 45% 0); transform: translate(-3px, 0); opacity: 0.6; }
+    93%, 100% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+  }
+
+  @keyframes glitchShiftB {
+    0%, 37% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+    39%     { clip-path: inset(55% 0 10% 0); transform: translate(4px, -1px); opacity: 0.6; }
+    41%     { clip-path: inset(15% 0 55% 0); transform: translate(-3px, 1px); opacity: 0.7; }
+    43%     { clip-path: inset(70% 0 8% 0); transform: translate(2px, 0); opacity: 0.5; }
+    45%, 61% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+    63%     { clip-path: inset(10% 0 60% 0); transform: translate(3px, -1px); opacity: 0.6; }
+    65%     { clip-path: inset(50% 0 15% 0); transform: translate(-2px, 1px); opacity: 0.55; }
+    67%, 89% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+    91%     { clip-path: inset(40% 0 30% 0); transform: translate(3px, 0); opacity: 0.55; }
+    93%, 100% { clip-path: inset(0 0 0 0); transform: translate(0, 0); opacity: 0; }
+  }
+
+  .sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 0 44px;
+  }
+
+  .status-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: var(--gold);
+    padding: 9px 18px;
+    border: 1px solid var(--panel-line);
+    border-radius: 100px;
+    background: rgba(201, 169, 97, 0.04);
+    margin-bottom: 64px;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: dotPulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.35); }
+    50% { opacity: 0.4; box-shadow: 0 0 0 5px rgba(201, 169, 97, 0); }
+  }
+
+  /* ===== FAQ ===== */
+  .faq-section {
+    width: 100%;
+    text-align: left;
+    border-top: 1px solid var(--panel-line);
+    padding-top: 48px;
+  }
+
+  .faq-heading {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--walnut);
+    margin: 0 0 28px;
+    text-align: center;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .faq-item:first-of-type { border-top: 1px solid var(--panel-line); }
+
+  .faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--board-cream);
+    font-family: 'Poppins', sans-serif;
+    font-size: 15.5px;
+    font-weight: 500;
+    text-align: left;
+    padding: 20px 4px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .faq-question:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .faq-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    position: relative;
+  }
+  .faq-icon::before, .faq-icon::after {
+    content: '';
+    position: absolute;
+    background: var(--gold);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.25s ease;
+  }
+  .faq-icon::before { width: 12px; height: 1.5px; }
+  .faq-icon::after { width: 1.5px; height: 12px; }
+  .faq-item[data-open="true"] .faq-icon::after { transform: translate(-50%, -50%) rotate(90deg) scaleY(0); }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .faq-item[data-open="true"] .faq-answer {
+    max-height: 240px;
+  }
+
+  .faq-answer p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin: 0 0 22px;
+    padding-right: 4px;
+    max-width: 62ch;
+  }
+
+  .contact-block {
+    margin-top: 56px;
+    text-align: center;
+  }
+
+  .contact-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--walnut);
+    margin: 0 0 12px;
+  }
+
+  .contact-number {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+  .contact-number:hover, .contact-number:focus-visible {
+    border-bottom-color: var(--gold);
+  }
+
+  footer {
+    position: relative;
+    z-index: 2;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: var(--panel-line);
+    padding-bottom: 40px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    h1.flicker { animation: none; }
+    h1.flicker::before, h1.flicker::after { display: none; }
+    .status-dot { animation: none; }
+    html, body { animation: none; }
+  }
+
+  @media (max-width: 480px) {
+    main { padding: 10vh 20px 8vh; }
+    .status-line { font-size: 12px; padding: 8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="board-texture"></div>
+  <div class="vignette"></div>
+
+  <main>
+    <div class="rook-mark">
+      <svg viewBox="0 0 24 24"><path d="M5 22h14v-2H5v2zm1-3h12l-1-6h-2v-3h2V8h-3V5h-2v3h-2V5H8v3H5v2h2v3H5l1 6zm5-15h2v2h-2V4z"/></svg>
+    </div>
+
+    <p class="eyebrow">BLUNDERSQUAD</p>
+
+    <h1 class="flicker" data-text="Server sedang maintenance">Server sedang maintenance</h1>
+
+    <p class="sub">
+      Papan sedang kami tata ulang. Sistem BlunderSquad tidak dapat diakses untuk sementara waktu selagi kami melakukan pembaruan.
+    </p>
+
+    <div class="status-line">
+      <span class="status-dot"></span>
+      Status: dalam perbaikan
+    </div>
+
+    <section class="faq-section" aria-label="Pertanyaan seputar maintenance">
+      <p class="faq-heading">PERTANYAAN YANG SERING DITANYAKAN</p>
+
+      <div class="faq-item" data-open="true">
+        <button class="faq-question" aria-expanded="true">
+          Kenapa server sedang maintenance?
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-answer">
+          <p>Karena sedang ada proses update sistem. Kami sedang membenahi beberapa bagian di balik layar supaya pengalaman bermain catur di BlunderSquad jadi lebih baik.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Berapa lama maintenance berlangsung?
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-answer">
+          <p>Belum ada waktu pasti. Pantau terus halaman ini, atau hubungi kontak di bawah untuk info paling baru.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Saya mau daftar jadi member, bisa sekarang?
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-answer">
+          <p>Nanti dulu ya. Sabar sebentar sampai maintenance selesai, pendaftaran akan dibuka kembali setelah sistem normal.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Akun dan data saya, aman tidak?
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-answer">
+          <p>Aman. Maintenance ini hanya untuk pembaruan sistem, bukan migrasi atau penghapusan data. Semua akun tetap tersimpan seperti biasa.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Bagaimana saya tahu kalau server sudah normal lagi?
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-answer">
+          <p>Halaman ini akan kembali menampilkan tampilan normal BlunderSquad begitu maintenance selesai. Bisa juga cek info terbaru lewat kontak di bawah.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Ke mana saya bisa bertanya lebih lanjut?
+          <span class="faq-icon"></span>
+        </button>
+        <div class="faq-answer">
+          <p>Silakan hubungi nomor kontak resmi kami yang tertera di bagian bawah halaman ini.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="contact-block">
+      <p class="contact-label">INFO LEBIH LANJUT</p>
+      <a class="contact-number" href="https://wa.me/6285174255816" target="_blank" rel="noopener">+62 851-7425-5816</a>
+    </div>
+  </main>
+
+  <footer>BlunderSquad — Komunitas Catur Online</footer>
+
+  <script>
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.getAttribute('data-open') === 'true';
+        item.setAttribute('data-open', String(!isOpen));
+        btn.setAttribute('aria-expanded', String(!isOpen));
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pendaftaran Ulang Anggota — BlunderSquad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1f2430;
+    --ink-soft:#5a6072;
+    --line:#dfe2e8;
+    --line-strong:#c3c8d2;
+    --bg:#eef0f4;
+    --card:#ffffff;
+    --accent:#4c2a85;
+    --accent-dark:#2e1a52;
+    --accent-gradient:linear-gradient(135deg, #3a1d68 0%, #5b2d95 55%, #7c3aed 100%);
+    --accent-soft:#efe9fa;
+    --error:#c0392b;
+    --error-soft:#fdecea;
+    --ok:#4c2a85;
+    --radius:10px;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:40px 16px 80px;
+  }
+
+  .wrap{
+    max-width:680px;
+    margin:0 auto;
+  }
+  .header{
+    background:var(--accent-gradient);
+    color:#fff;
+    border-radius:var(--radius) var(--radius) 0 0;
+    padding:28px 32px 24px;
+  }
+
+  .brand-row{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:6px;
+  }
+
+  .brand{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:34px;
+    letter-spacing:0.5px;
+    line-height:1;
+  }
+
+  .brand-tag{
+    font-size:13px;
+    color:rgba(255,255,255,0.75);
+    font-weight:500;
+  }
+
+  .header h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-weight:400;
+    font-size:22px;
+    letter-spacing:0.3px;
+    margin:14px 0 8px;
+    line-height:1.15;
+  }
+
+  .header p{
+    margin:0;
+    font-size:14px;
+    line-height:1.5;
+    color:rgba(255,255,255,0.85);
+    max-width:54ch;
+  }
+
+  .required-note{
+    background:var(--card);
+    padding:10px 32px;
+    font-size:13px;
+    color:var(--error);
+    border-bottom:1px solid var(--line);
+  }
+
+  form{
+    background:var(--card);
+    border-radius:0 0 var(--radius) var(--radius);
+    box-shadow:0 1px 3px rgba(30,34,45,0.08);
+  }
+
+  .field{
+    padding:24px 32px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .field:last-of-type{
+    border-bottom:none;
+  }
+
+  label{
+    display:block;
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:4px;
+  }
+
+  label .req{
+    color:var(--error);
+    margin-left:2px;
+  }
+
+  .hint{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+    line-height:1.4;
+  }
+
+  input[type="text"], input[type="tel"]{
+    width:100%;
+    border:none;
+    border-bottom:1.5px solid var(--line-strong);
+    background:transparent;
+    padding:8px 2px 10px;
+    font-size:15px;
+    font-family:inherit;
+    color:var(--ink);
+    outline:none;
+    transition:border-color 0.15s ease;
+  }
+
+  input[type="text"]::placeholder, input[type="tel"]::placeholder{
+    color:#9aa0ac;
+  }
+
+  input[type="text"]:focus, input[type="tel"]:focus{
+    border-bottom:2px solid var(--accent);
+  }
+
+  input.invalid{
+    border-bottom:2px solid var(--error);
+  }
+
+  .error-msg{
+    display:none;
+    font-size:12.5px;
+    color:var(--error);
+    margin-top:6px;
+  }
+
+  .error-msg.show{
+    display:block;
+  }
+  .chess-field input{
+    margin-bottom:10px;
+  }
+
+  .lookup-status{
+    font-size:13px;
+    min-height:18px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:var(--ink-soft);
+  }
+
+  .lookup-status.loading{ color:var(--ink-soft); }
+  .lookup-status.success{ color:var(--ok); }
+  .lookup-status.error{ color:var(--error); }
+
+  .spinner{
+    width:12px;
+    height:12px;
+    border:2px solid var(--line-strong);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin 0.7s linear infinite;
+    flex-shrink:0;
+  }
+
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .rating-card{
+    margin-top:14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    background:#fafbfc;
+  }
+
+  .rating-card-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 14px;
+    background:var(--accent-soft);
+    border-bottom:1px solid var(--line);
+  }
+
+  .rating-card-header img{
+    width:32px;
+    height:32px;
+    border-radius:4px;
+    background:#fff;
+    object-fit:cover;
+  }
+
+  .rating-card-header .who{
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--ink);
+  }
+
+  .rating-card-header .who span{
+    display:block;
+    font-weight:400;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  .rating-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+  }
+
+  .rating-item{
+    padding:12px 10px;
+    text-align:center;
+    border-right:1px solid var(--line);
+  }
+
+  .rating-item:last-child{
+    border-right:none;
+  }
+
+  .rating-item .val{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:24px;
+    color:var(--ink);
+    line-height:1;
+  }
+
+  .rating-item .val.na{
+    color:#b6bac3;
+    font-size:16px;
+    font-family:inherit;
+    font-weight:600;
+  }
+
+  .rating-item .lbl{
+    font-size:11px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    margin-top:3px;
+  }
+
+  .rating-locked-note{
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:10px 14px;
+    border-top:1px solid var(--line);
+    background:#f5f6f8;
+  }
+
+  .prefix-input{
+    position:relative;
+  }
+
+  .prefix-wa{
+    display:flex;
+    align-items:center;
+    border-bottom:1.5px solid var(--line-strong);
+  }
+
+  .prefix-wa span{
+    font-size:15px;
+    color:var(--ink-soft);
+    padding-bottom:10px;
+  }
+
+  .prefix-wa input{
+    border-bottom:none;
+    padding-left:4px;
+  }
+
+  .prefix-wa:focus-within{
+    border-bottom:2px solid var(--accent);
+  }
+
+  .submit-row{
+    padding:24px 32px 32px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+
+  button.submit-btn{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:11px 28px;
+    font-size:14.5px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+
+  button.submit-btn:hover{
+    background:var(--accent-dark);
+  }
+
+  button.submit-btn:disabled{
+    background:#a9b0bb;
+    cursor:not-allowed;
+  }
+
+  .clear-link{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    text-decoration:underline;
+  }
+
+  .success-panel{
+    display:none;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 1px 3px rgba(30,34,45,0.08);
+    padding:48px 32px;
+    text-align:center;
+  }
+
+  .success-panel.show{
+    display:block;
+  }
+
+  .success-panel .check{
+    width:52px;
+    height:52px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:var(--accent-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .success-panel h2{
+    font-family:'Bebas Neue', sans-serif;
+    font-weight:400;
+    font-size:26px;
+    margin:0 0 8px;
+    letter-spacing:0.3px;
+  }
+
+  .success-panel p{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:0 0 24px;
+  }
+
+  .success-summary{
+    text-align:left;
+    background:#f5f6f8;
+    border-radius:8px;
+    padding:16px 20px;
+    font-size:13.5px;
+    line-height:2;
+  }
+
+  .success-summary b{
+    display:inline-block;
+    min-width:150px;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+
+  .footer-note{
+    text-align:center;
+    font-size:12px;
+    color:#9aa0ac;
+    margin-top:24px;
+  }
+
+  @media (max-width:520px){
+    .header{ padding:22px 20px 20px; }
+    .field{ padding:20px 20px; }
+    .required-note{ padding:10px 20px; }
+    .submit-row{ padding:20px 20px 26px; flex-direction:row; }
+    .rating-item .val{ font-size:20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand">BLUNDERSQUAD</div>
+      <div class="brand-tag">Komunitas Catur</div>
+    </div>
+    <h1>Formulir Pendaftaran Ulang Anggota</h1>
+    <p>Isi data di bawah untuk memperbarui status keanggotaan kamu. Rating chess.com terisi otomatis dari username yang kamu masukkan dan tidak bisa diubah manual.</p>
+  </div>
+
+  <div class="required-note">* Wajib diisi</div>
+
+  <form id="regForm" novalidate>
+
+    <div class="field">
+      <label for="fullName">Nama lengkap sesuai identitas<span class="req">*</span></label>
+      <div class="hint">Sesuai KTP / KK, bukan nama panggilan.</div>
+      <input type="text" id="fullName" name="fullName" placeholder="Contoh: Muhammad Rizky Pratama" autocomplete="name">
+      <div class="error-msg" id="err-fullName">Nama lengkap wajib diisi.</div>
+    </div>
+
+    <div class="field">
+      <label for="tiktok">Akun TikTok<span class="req">*</span></label>
+      <div class="hint">Sertakan tanda @, contoh: @blundersquad</div>
+      <input type="text" id="tiktok" name="tiktok" placeholder="@username_tiktok">
+      <div class="error-msg" id="err-tiktok">Akun TikTok wajib diisi.</div>
+    </div>
+
+    <div class="field chess-field">
+      <label for="chessUsername">Username chess.com<span class="req">*</span></label>
+      <div class="hint">Rating live, rapid, dan bullet akan diambil otomatis dari chess.com.</div>
+      <input type="text" id="chessUsername" name="chessUsername" placeholder="username chess.com kamu" autocomplete="off">
+      <div class="lookup-status" id="lookupStatus"></div>
+      <div class="error-msg" id="err-chessUsername">Username chess.com wajib diisi dan harus valid.</div>
+
+      <div class="rating-card" id="ratingCard" style="display:none;">
+        <div class="rating-card-header">
+          <img id="ratingAvatar" src="" alt="">
+          <div class="who">
+            <span id="ratingRealname">—</span>
+            <span id="ratingUsername">@—</span>
+          </div>
+        </div>
+        <div class="rating-grid">
+          <div class="rating-item">
+            <div class="val" id="ratingRapid">–</div>
+            <div class="lbl">Rapid</div>
+          </div>
+          <div class="rating-item">
+            <div class="val" id="ratingBlitz">–</div>
+            <div class="lbl">Blitz</div>
+          </div>
+          <div class="rating-item">
+            <div class="val" id="ratingBullet">–</div>
+            <div class="lbl">Bullet</div>
+          </div>
+        </div>
+        <div class="rating-locked-note">🔒 Data rating diambil otomatis dari chess.com API dan tidak dapat diedit.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="wa">Nomor WhatsApp<span class="req">*</span></label>
+      <div class="hint">Nomor aktif, akan digunakan untuk info grup.</div>
+      <div class="prefix-wa">
+        <span>+62</span>
+        <input type="tel" id="wa" name="wa" placeholder="81234567890" inputmode="numeric">
+      </div>
+      <div class="error-msg" id="err-wa">Nomor WhatsApp wajib diisi dengan format yang benar.</div>
+    </div>
+
+    <div class="field">
+      <label for="dana">Nomor DANA<span class="req">*</span></label>
+      <div class="hint">Untuk keperluan transaksi/administrasi komunitas.</div>
+      <input type="tel" id="dana" name="dana" placeholder="08xxxxxxxxxx" inputmode="numeric">
+      <div class="error-msg" id="err-dana">Nomor DANA wajib diisi dengan format yang benar.</div>
+    </div>
+
+    <div class="submit-row">
+      <button type="submit" class="submit-btn" id="submitBtn">Kirim Pendaftaran</button>
+      <button type="button" class="clear-link" id="clearBtn">Bersihkan formulir</button>
+    </div>
+
+  </form>
+
+  <div class="success-panel" id="successPanel">
+    <div class="check">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="#2f5d50" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>Pendaftaran Terkirim</h2>
+    <p>Terima kasih, data kamu sudah tercatat sebagai anggota BlunderSquad.</p>
+    <div class="success-summary" id="successSummary"></div>
+  </div>
+
+  <div class="footer-note">BlunderSquad — Pendaftaran Ulang Anggota</div>
+
+</div>
+
+<script>
+(function(){
+  const form = document.getElementById('regForm');
+  const chessInput = document.getElementById('chessUsername');
+  const lookupStatus = document.getElementById('lookupStatus');
+  const ratingCard = document.getElementById('ratingCard');
+  const ratingRapid = document.getElementById('ratingRapid');
+  const ratingBlitz = document.getElementById('ratingBlitz');
+  const ratingBullet = document.getElementById('ratingBullet');
+  const ratingAvatar = document.getElementById('ratingAvatar');
+  const ratingRealname = document.getElementById('ratingRealname');
+  const ratingUsername = document.getElementById('ratingUsername');
+  let debounceTimer = null;
+  let currentLookupToken = 0;
+  let lockedRatingData = null;
+  function setStatus(state, text){
+    lookupStatus.className = 'lookup-status ' + (state || '');
+    lookupStatus.innerHTML = state === 'loading'
+      ? '<span class="spinner"></span>' + text
+      : text;
+  }
+
+  function formatRating(obj){
+    if(obj && obj.last && typeof obj.last.rating === 'number'){
+      return obj.last.rating;
+    }
+    return null;
+  }
+
+  function renderRatingCard(data, username){
+    ratingCard.style.display = 'block';
+
+    const rapid = formatRating(data.chess_rapid);
+    const blitz = formatRating(data.chess_blitz);
+    const bullet = formatRating(data.chess_bullet);
+
+    function fill(el, val){
+      if(val === null){
+        el.textContent = 'N/A';
+        el.classList.add('na');
+      } else {
+        el.textContent = val;
+        el.classList.remove('na');
+      }
+    }
+    fill(ratingRapid, rapid);
+    fill(ratingBlitz, blitz);
+    fill(ratingBullet, bullet);
+
+    ratingUsername.textContent = '@' + username;
+    ratingRealname.textContent = username;
+
+    lockedRatingData = {
+      username: username,
+      rapid: rapid,
+      blitz: blitz,
+      bullet: bullet
+    };
+    fetch('https://api.chess.com/pub/player/' + encodeURIComponent(username))
+      .then(r => r.ok ? r.json() : null)
+      .then(profile => {
+        if(!profile) return;
+        if(profile.avatar){
+          ratingAvatar.src = profile.avatar;
+          ratingAvatar.style.display = 'block';
+        } else {
+          ratingAvatar.style.display = 'none';
+        }
+        if(profile.name){
+          ratingRealname.textContent = profile.name;
+        }
+      })
+      .catch(() => { ratingAvatar.style.display = 'none'; });
+  }
+
+  function resetRatingCard(){
+    ratingCard.style.display = 'none';
+    lockedRatingData = null;
+    ratingAvatar.style.display = 'none';
+    ratingAvatar.src = '';
+  }
+
+  function lookupChessUser(username){
+    const token = ++currentLookupToken;
+
+    if(!username){
+      setStatus('', '');
+      resetRatingCard();
+      return;
+    }
+
+    setStatus('loading', 'Mengambil rating dari chess.com…');
+    resetRatingCard();
+
+    fetch('https://api.chess.com/pub/player/' + encodeURIComponent(username) + '/stats')
+      .then(res => {
+        if(token !== currentLookupToken) return null;
+        if(res.status === 404){
+          throw new Error('NOT_FOUND');
+        }
+        if(!res.ok){
+          throw new Error('API_ERROR');
+        }
+        return res.json();
+      })
+      .then(data => {
+        if(!data || token !== currentLookupToken) return;
+        setStatus('success', '✓ Username ditemukan, rating berhasil dimuat.');
+        renderRatingCard(data, username);
+      })
+      .catch(err => {
+        if(token !== currentLookupToken) return;
+        resetRatingCard();
+        if(err.message === 'NOT_FOUND'){
+          setStatus('error', '✕ Username chess.com tidak ditemukan.');
+        } else {
+          setStatus('error', '✕ Gagal mengambil data. Periksa koneksi lalu coba lagi.');
+        }
+      });
+  }
+
+  chessInput.addEventListener('input', function(){
+    clearTimeout(debounceTimer);
+    const val = this.value.trim();
+    hideFieldError('chessUsername');
+    debounceTimer = setTimeout(() => lookupChessUser(val), 550);
+  });
+
+  function showFieldError(id, message){
+    const input = document.getElementById(id);
+    const err = document.getElementById('err-' + id);
+    input.classList.add('invalid');
+    if(message){ err.textContent = message; }
+    err.classList.add('show');
+  }
+
+  function hideFieldError(id){
+    const input = document.getElementById(id);
+    const err = document.getElementById('err-' + id);
+    input.classList.remove('invalid');
+    err.classList.remove('show');
+  }
+
+  [ 'fullName', 'tiktok', 'chessUsername', 'wa', 'dana' ].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => hideFieldError(id));
+  });
+
+  function validatePhone(val){
+    const digits = val.replace(/\D/g, '');
+    return digits.length >= 9 && digits.length <= 14;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    let valid = true;
+
+    const fullName = document.getElementById('fullName').value.trim();
+    const tiktok = document.getElementById('tiktok').value.trim();
+    const chessUsername = document.getElementById('chessUsername').value.trim();
+    const wa = document.getElementById('wa').value.trim();
+    const dana = document.getElementById('dana').value.trim();
+
+    if(!fullName){ showFieldError('fullName'); valid = false; }
+    if(!tiktok){ showFieldError('tiktok'); valid = false; }
+
+    if(!chessUsername){
+      showFieldError('chessUsername', 'Username chess.com wajib diisi dan harus valid.');
+      valid = false;
+    } else if(!lockedRatingData || lockedRatingData.username.toLowerCase() !== chessUsername.toLowerCase()){
+      showFieldError('chessUsername', 'Tunggu proses verifikasi username selesai sebelum mengirim.');
+      valid = false;
+    }
+
+    if(!wa || !validatePhone(wa)){
+      showFieldError('wa', 'Masukkan nomor WhatsApp yang valid (9–14 digit).');
+      valid = false;
+    }
+    if(!dana || !validatePhone(dana)){
+      showFieldError('dana', 'Masukkan nomor DANA yang valid (9–14 digit).');
+      valid = false;
+    }
+
+    if(!valid) return;
+
+    const payload = {
+      fullName,
+      tiktok,
+      chessUsername,
+      rating: {
+        rapid: lockedRatingData.rapid,
+        blitz: lockedRatingData.blitz,
+        bullet: lockedRatingData.bullet
+      },
+      wa: '+62' + wa.replace(/\D/g, ''),
+      dana: dana.replace(/\D/g, '')
+    };
+
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = 'Memproses...';
+    submitBtn.disabled = true;
+
+    fetch('api/re_register.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') {
+        showSuccess(payload);
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch(err => {
+      alert('Gagal terhubung ke server.');
+    })
+    .finally(() => {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    });
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    form.reset();
+    resetRatingCard();
+    setStatus('', '');
+    [ 'fullName', 'tiktok', 'chessUsername', 'wa', 'dana' ].forEach(hideFieldError);
+  });
+
+  function showSuccess(payload){
+    form.style.display = 'none';
+    document.querySelector('.required-note').style.display = 'none';
+
+    const summary = document.getElementById('successSummary');
+    summary.innerHTML = `
+      <div><b>Nama lengkap</b>${payload.fullName}</div>
+      <div><b>TikTok</b>${payload.tiktok}</div>
+      <div><b>Chess.com</b>${payload.chessUsername}</div>
+      <div><b>Rating (rapid/blitz/bullet)</b>${payload.rating.rapid ?? 'N/A'} / ${payload.rating.blitz ?? 'N/A'} / ${payload.rating.bullet ?? 'N/A'}</div>
+      <div><b>WhatsApp</b>${payload.wa}</div>
+      <div><b>DANA</b>${payload.dana}</div>
+    `;
+    document.getElementById('successPanel').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+})();
+</script>
+
+</body>
+</html>
